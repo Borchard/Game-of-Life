@@ -1,0 +1,42 @@
+%  CA:  The Game of Life
+%
+%  input:
+%       n = size of cell.  total number of sites = n^2
+%       nstep = number of Monte Carlo Steps (MCS)
+%
+%  output:
+%       game = series of fram of Game of Life
+%
+
+function[game]= goL(n,nstep)
+% create initial lattice of activity = 0 and 1
+colormap(gray(2));
+s = floor(2*rand(n));
+%  st will be a temporary lattice used to accumulate new lattice
+st=s;
+for k = 1:nstep
+    for i = 1:n
+        for j = 1:n
+            ip1 = pbc(i+1,n);
+            im1 = pbc(i-1,n);
+            jp1 = pbc(j+1,n);
+            jm1 = pbc(j-1,n);
+%  calculate activity in Moore environment
+             A = s(ip1,j) + s(ip1,jp1) + s(i,jp1) + s(im1,jp1);
+             A = A + s(im1,j) + s(im1,jm1) + s(i,jm1) + s(ip1,jm1);
+% make modifications to st, a temporary lattice
+            if A > 3 | A < 2
+                 st(i,j) = 0;
+             elseif A == 3
+                 st(i,j) = 1;
+             else
+                 st(i,j) = s(i,j);
+             end
+        end
+    end
+%  replace old lattice values with new values (update all at once)
+    s = st;
+% make a plot, then store frame for a movie
+    imagesc(s);axis equal;axis off;
+    game(k) = getframe;
+end
